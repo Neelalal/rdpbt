@@ -1,0 +1,19 @@
+# Stata temporary files
+*.log
+*.smcl
+*.gph
+
+# Output files
+*.dta
+*.csv
+*.xlsx
+
+# Backup files
+*.tmp
+*.sav
+*.old
+*.~*
+
+# System files
+.DS_Store
+Thumbs.db
