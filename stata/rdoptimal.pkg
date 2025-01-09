@@ -2,11 +2,11 @@ PACKAGE rdoptimal
 TITLE   Regression Discontinuity Optimal Bandwidth Selection Tool
 DESCRIPTION
     Determines the optimal bandwidth and model selection for regression discontinuity design models.
-PACKAGE AUTHOR  Neel Lal
+AUTHOR  Neel Lal
 VERSION 1.0.0
 DATE    01 Jan 2025
 INSTALLATION FILES
     rdoptimal.ado
     rdoptimal.sthlp
 ANCILLARY FILES
-    testdata.dta
+    rdd_optimal_sim.dta
