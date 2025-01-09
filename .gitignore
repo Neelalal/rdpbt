@@ -8,6 +8,9 @@
 *.csv
 *.xlsx
 
+# Allow the test dataset
+!rdd_optimal_sim.dta
+
 # Backup files
 *.tmp
 *.sav
@@ -17,3 +20,5 @@
 # System files
 .DS_Store
 Thumbs.db
+
+
