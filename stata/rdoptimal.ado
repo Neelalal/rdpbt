@@ -9,7 +9,7 @@
 cap program drop rdoptimal
 program define rdoptimal
     version 16.0 
-    syntax varlist(min=2 max=2) [if], ///
+    syntax varlist(min=2 max=2) [if] [in], ///
         [include_graphs] /// 
         donut(donut_var) /// 
         event_var(event_var) /// 
