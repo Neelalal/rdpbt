@@ -31,6 +31,7 @@ where {it:score_var} refers to the running variable representing the distance fr
 
 {marker options}{...}
 {title:Options}
+
 {synoptset 22 tabbed}{...}
 {synopthdr}
 {synoptline}
