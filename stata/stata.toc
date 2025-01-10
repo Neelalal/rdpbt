@@ -1,1 +1,6 @@
-rdoptimal.pkg
+v 1
+d Neel Lal
+p rdoptimal - Regression Discontinuity Optimal Bandwidth Selection Tool
+
+* Packages:
+p rdoptimal - Stata command for optimal bandwidth selection in RDD
