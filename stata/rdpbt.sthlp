@@ -37,7 +37,7 @@ where {it:score_var} refers to the running variable representing the distance fr
 {synoptline}
 {synopt: {opt donut(donut_var)}} Specifies a variable indicating donut observations. The command runs additional regressions excluding observations where {it:donut_var} equals 1.{p_end}
 {synopt: {opt event_var(event_var)}} Specifies the event variable that defines the events to loop through for the regression.{p_end}
-{synopt: {opt group_var(group_var)}} Specifies the group variable that defines the bandwidths to loop through within each event. The {it:group_var} must be centered around zero, with no observations equal to zero. For example, if {it:group_var} represents months, January could be coded as 1, December as -1, February as 2, and November as -2.{p_end}
+{synopt: {opt group_var(group_var)}} Specifies the group variable that defines the bandwidths to loop through within each event. The {it:group_var} must be centered around zero, with no observations equal to zero. For example, if {it:group_var} refers to months, January could be coded as 1, December as -1, February as 2, and November as -2.{p_end}
 {synopt: {opt group_range(#)}} Specifies the maximum range for groups to consider on each side of the cutoff. Must be a positive numeric value.{p_end}
 
 
@@ -46,7 +46,7 @@ where {it:score_var} refers to the running variable representing the distance fr
 
 {p 4 8} Example usage of {cmd:rdpbt}:{p_end}
 {p 8 8} {cmd:. use "rdpbt_sim.dta", clear}{p_end}
-{p 8 8} {cmd:. rdpbt has_inc score if inrange(group, -9, 9), include_graphs donut(donut) event_var(period) group_var(group) group_range(9)}{p_end}
+{p 8 8} {cmd:. rdpbt has_inc score if inrange(group, -9, 9), donut(donut) event_var(period) group_var(group) group_range(9)}{p_end}
 
 {marker references}{...}
 {title:References}
