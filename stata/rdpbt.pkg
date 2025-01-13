@@ -1,0 +1,23 @@
+v 1
+
+d rdpbt: Regression Discontinuity Optimal Bandwidth Selection Tool
+d
+d Author:
+d - Jacob Goldin, University of Chicago Law School
+d - Tatiana Homonoff, Wagner School of Public Service, New York University
+d - Neel Lal, University of Chicago Law School
+d - Ithai Lurie, Department of the Treasury
+d - Katherine Michelmore, Ford School of Public Policy, University of Michigan
+d - Matthew Unrath, Price School of Public Policy, University of Southern California
+d
+d rdoptimal selects the optimal bandwidth and polynomial specification in regression discontinuity designs by minimizing the root mean squared error (RMSE) across placebo events.
+d
+d For details (help file and documentation), use:
+d . help rdpbt
+d
+d Distribution-Date: 20250101
+
+f rdpbt.ado
+f rdpbt.sthlp
+
+f rdpbt_sim.dta

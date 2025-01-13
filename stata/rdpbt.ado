@@ -1,17 +1,10 @@
-*! version 1.0.0  01Jan2025  Neel Lal lalneel@grinnell.edu
-*Need to do the following
-	*(1) Specify the models to test: (1) all, levels, linear, quadratic
-	*(2) Allow users to detail whether or not there is a donut and if so, the size of the donut (Donut observations)
-	*(3) Event variable (e.g., which group to loop through for the regression)
-	*(4) Create graph option
-	*(5) Allow users to specify weighting 
-	*(6) Allow users to optimize one side or two sides
-cap program drop rdoptimal
-program define rdoptimal
+*! version 1.0.0  01Jan2025  Neel Lal nlal@uchicago.edu
+
+cap program drop rdpbt
+program define rdpbt
     version 16.0 
     syntax varlist(min=2 max=2) [if] [in], ///
-        [include_graphs] /// 
-        donut(donut_var) /// 
+        [donut(donut_var)] /// 
         event_var(event_var) /// 
         group_var(group_var) /// 
         group_range(numlist) 
@@ -21,22 +14,18 @@ program define rdoptimal
         marksample touse, novarlist
         keep if `touse'
 
-    // Assign variables
+    * Assign variables
     local dep_var `1'  // The dependent variable
     local score_var `2'  // The score variable
 
-    // Check if `include_graphs` is specified
-    local include_graphs = cond("`include_graphs'" != "", "yes", "no")
-		di "`include_graphs'"
-
-    // Validate and handle `event_var`
+    * Validate and handle `event_var`
         if "`event_var'" == "" {
             di as err "The `event_var` option is required but not specified."
             exit 198
         }
     local event_var `event_var'
 
-    // Validate and handle `group_var`
+    * Validate and handle `group_var`
         if "`group_var'" == "" {
             di as err "The `group_var` option is required but not specified."
             exit 198
@@ -68,9 +57,9 @@ program define rdoptimal
 
     * Create a temporary file to store results
 		preserve
-				clear
+			clear
 		        tempfile results
-				save `results', emptyok
+			save `results', emptyok
 		restore
 
     * Get unique levels of `event_var`
@@ -147,15 +136,6 @@ program define rdoptimal
 
     * Collapse RMSE values by group
         collapse (mean) rmse*, by(group)
-
-    * Create graph if include_graphs is specified
-        if "`include_graphs'" == "yes" {
-            twoway (line rmse_levels group) ///
-                   (line rmse_linear group) ///
-                   (line rmse_quadratic group), ///
-                   xtitle("Group", size(medsmall)) ///
-                   ytitle("RMSE", size(medsmall))
-        }
 
     * Find the optimal specification
         reshape long rmse_, i(group) j(model) string
