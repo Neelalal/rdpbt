@@ -9,7 +9,7 @@
 *.xlsx
 
 # Allow the test dataset
-!rdd_optimal_sim.dta
+!rdpbt_sim.dta
 
 # Backup files
 *.tmp
