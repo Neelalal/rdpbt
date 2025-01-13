@@ -4,9 +4,9 @@ cap program drop rdpbt
 program define rdpbt
     version 16.0 
     syntax varlist(min=2 max=2) [if] [in], ///
-        [donut(donut_var)] /// 
-        event_var(event_var) /// 
-        group_var(group_var) /// 
+        [donut(varlist)] /// 
+        event_var(varlist) /// 
+        group_var(varlist) /// 
         group_range(numlist) 
 		
 
@@ -142,7 +142,7 @@ program define rdpbt
         sort rmse_
         local model = model[1]
         local bw = group[1]
-        di "Optimal Specification is `model' with a `bw' bandwidth"
+        di "Optimal Specification is `model' with a `bw' group bandwidth"
 		
 
 end

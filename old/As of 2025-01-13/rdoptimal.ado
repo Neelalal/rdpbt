@@ -143,13 +143,12 @@ program define rdpbt
     * Collapse RMSE values by group
         collapse (mean) rmse*, by(group)
 
-
     * Find the optimal specification
         reshape long rmse_, i(group) j(model) string
         sort rmse_
         local model = model[1]
         local bw = group[1]
-        di "Optimal Specification is `model' with a `bw' bandwidth"
+        di "Optimal Specification is `model' with a `bw' group bandwidth"
 		
 
 end
