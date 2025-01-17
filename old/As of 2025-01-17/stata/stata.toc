@@ -1,0 +1,6 @@
+v 1
+d Neel Lal
+p rdpbt - Regression Discontinuity Optimal Bandwidth Selection Tool
+
+* Packages:
+p rdpbt - Stata command for optimal bandwidth selection in RDD models
