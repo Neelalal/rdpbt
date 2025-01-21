@@ -213,7 +213,7 @@ program define rdpbt
 			local model = model1[1]
 			local bw = group[1]
 			di "Optimal Specification is `model' with a `bw' group bandwidth `include_donut' a donut"
-			
+			drop model1 model
 		}	
 		
 	if "`tag_var'" != "" {
@@ -222,7 +222,6 @@ program define rdpbt
 			use `original', clear
 			
 			*Generate a tag for the optimal bandwidth and donut
-			local include_donut = "with"
 				gen `tag_var' = inrange(`group_var', -`bw', `bw')
 				if "`include_donut'" == "with" {
 					qui replace `tag_var' = 0 if `donut_var' == 1

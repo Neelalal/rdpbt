@@ -213,7 +213,7 @@ program define rdpbt
 			local model = model1[1]
 			local bw = group[1]
 			di "Optimal Specification is `model' with a `bw' group bandwidth `include_donut' a donut"
-			
+			drop model1 model2
 		}	
 		
 	if "`tag_var'" != "" {
