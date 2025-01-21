@@ -16,17 +16,17 @@
 {marker syntax}{...}
 {title:Syntax}
 
-{p 4 8}{cmd:rdpbt} {it:dep_var score_var} {ifin} {cmd:,} [{opt donut(donut_var)}] {cmd:event_var(event_var)} {cmd:group_var(group_var)} {cmd:group_range(#)}{p_end}
+{p 4 8}{cmd:rdpbt} {it:dep_var score_var} {ifin}{cmd:,} {opt event_var(event_var)} {opt group_var(group_var)} {opt group_range(#)} [{opt donut(donut_var)} {opt treat(treat_var)} {opt placebo(placebo_var)} {opt tag(string)}]{p_end}
 {p 8 8}
-where {it:score_var} refers to the running variable representing the distance from the treatment threshold. Values of {it:score_var} greater than or equal to zero indicate membership in the treatment group.{p_end}
+where {it:score_var} refers to the running variable representing the distance from the treatment threshold.{p_end}
 
 
 {marker description}{...}
 {title:Description}
 
-{p 4 8}{cmd:rdpbt} selects the optimal combination of bandwidth and polynomial order in regression discontinuity designs. The command loops through specified placebo events to identify the combination that minimizes the root mean squared error (RMSE).{p_end}
+{p 4 8}{cmd:rdpbt} selects the optimal combination of bandwidth and polynomial order in regression discontinuity designs. The command loops through specified placebo events to identify the combination that minimizes the root mean squared error (RMSE). The provided dataset should only reflect placebo observations or should include a variable, {it:placebo_var}, that indicates the placebo observations. {p_end}
 
-{p 4 8}The algorithm is detailed in {browse "https://www.nber.org/papers/w32343":Goldin et al. (2024)} and returns a dataset detailing RMSE values by {it:group_var}.{p_end}
+{p 4 8}The algorithm is detailed in {browse "https://www.nber.org/papers/w32343":Goldin et al. (2024)} and, provided that the tag command is not specified, returns a dataset detailing RMSE values by {it:group_var}.{p_end}
 
 
 {marker options}{...}
@@ -39,7 +39,9 @@ where {it:score_var} refers to the running variable representing the distance fr
 {synopt: {opt event_var(event_var)}} Specifies the event variable that defines the events to loop through for the regression.{p_end}
 {synopt: {opt group_var(group_var)}} Specifies the group variable that defines the bandwidths to loop through within each event. The {it:group_var} must be centered around zero, with no observations equal to zero. For example, if {it:group_var} refers to months, January could be coded as 1, December as -1, February as 2, and November as -2.{p_end}
 {synopt: {opt group_range(#)}} Specifies the maximum range for groups to consider on each side of the cutoff. Must be a positive numeric value.{p_end}
-
+{synopt: {opt treat(treat_var)}} Specifies the treatment variable. If unspecified, observations with {it:score_var} greater than or equal to zero are considered part of the treatment group.{p_end}
+{synopt: {opt placebo(placebo_var)}} Specifies the variable identifying the placebo dataset and, subsequently, filters the data to include only rows where {it:placebo_var} equals 1. Default is to consider the input data as the placebo dataset. {p_end}
+{synopt: {opt tag(string)}} When specified, returns to the original dataset and creates new variable tagging observations within the optimal bandwidth. Observations are tagged if they fall within the bandwidth that minimizes RMSE and satisfy the optimal donut condition (if applicable).{p_end}
 
 {marker example}{...}
 {title:Example}
@@ -47,6 +49,14 @@ where {it:score_var} refers to the running variable representing the distance fr
 {p 4 8} Example usage of {cmd:rdpbt}:{p_end}
 {p 8 8} {cmd:. use "rdpbt_sim.dta", clear}{p_end}
 {p 8 8} {cmd:. rdpbt has_inc score if inrange(group, -9, 9), donut(donut) event_var(period) group_var(group) group_range(9)}{p_end}
+
+{marker stored_results}{...}
+{title:Stored Results}
+
+{p 4 8} {cmd:rdpbt} stores the following in memory:{p_end}
+{p 8 8} A dataset containing RMSE values by bandwidth and model specification.{p_end}
+{p 8 8} When the {cmd:tag} option is specified, the original dataset is restored with {it:tag_var} identifying observations within the optimal bandwidth.{p_end}
+
 
 {marker references}{...}
 {title:References}

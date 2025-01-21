@@ -1,27 +1,43 @@
-*! version 1.0.0  01Jan2025  Neel Lal nlal@uchicago.edu
+*! version 1.0.1  21Jan2025  Neel Lal nlal@uchicago.edu
 
 cap program drop rdpbt
 program define rdpbt
     version 16.0 
-    syntax varlist(min=2 max=2) [if] [in], ///
+    syntax varlist(min=2 max=2) [if] [in] , ///
         [donut(varlist)] /// 
 		[treat(varlist)] ///
+		[placebo(varlist)] ///
+		[tag(string)] ///
         event_var(varlist) /// 
         group_var(varlist) /// 
         group_range(numlist) 
-		
-	*Save original dataset
-		tempfile original
-		save `original', replace
-		
 
+	*Save original dataset
+		qui tempfile original
+		qui save `original', replace
+		
     * Apply if condition
         marksample touse, novarlist
-        keep if `touse'
+        qui keep if `touse'
 
     * Assign variables
-    local dep_var `1'  // The dependent variable
-    local score_var `2'  // The score variable
+		local dep_var `1'  // The dependent variable
+		local score_var `2'  // The score variable
+		
+		local score = subinstr("`score'", ",", "",.) //Corrects error where `score' without space next to "," caused var to be stored as `score,'
+	
+	* Check for invalid names
+		capture confirm variable `dep_var'
+		if _rc {
+			di as err "The dependent variable `dep_var' is not found in the dataset."
+			exit 198
+		}
+
+		capture confirm variable `score_var'
+		if _rc {
+			di as err "The score variable `score_var' is not found in the dataset."
+			exit 198
+		}
 
     * Validate and handle `event_var`
         if "`event_var'" == "" {
@@ -58,24 +74,61 @@ program define rdpbt
 			}
 			local donut_var `donut'
 		}
+		
+    * Validate and handle `treat`
+		local treat_var ""
+		if "`treat'" == "" {
+			capture drop treat
+			gen treat = `score_var' >= 0
+			local treat_var "treat"
+		} 
+		if "`treat'" != "" {
+			capture confirm variable `treat'
+			if _rc {
+				di as err "The variable specified in the `treat` option is not found in the dataset."
+				exit 198
+			}
+			local treat_var `treat'
+		}
 	
+    * Validate and handle `placebo`
+		local placebo_var ""
+		if "`placebo'" != "" {
+			capture confirm variable `placebo'
+			if _rc {
+				di as err "The variable specified in the `placebo` option is not found in the dataset."
+				exit 198
+			}
+			keep if `placebo' == 1
+		}
+	
+			
+	* Validate the `tag` option
+		local tag_var ""
+		if "`tag'" != "" {
+			capture confirm variable `tag'
+			if !_rc {
+				di as err "The variable `tag' already exists."
+				exit 198
+			}
+			local tag_var `tag'
+		} 
 
     * Create a temporary file to store results
 		preserve
 			clear
-		        tempfile results
-			save `results', emptyok
+		    qui tempfile results
+			qui save `results', emptyok
 		restore
 
     * Get unique levels of `event_var`
-        levelsof `event_var', local(event)
+        qui levelsof `event_var', local(event)
 
     * Generate necessary variables
-        capture drop treat score_sq treatxscore treatxscore_sq
-        gen treat = `score_var' >= 0
+        capture drop score_sq treatxscore treatxscore_sq
         gen score_sq = `score_var'^2
-        gen treatxscore = treat * `score_var'
-        gen treatxscore_sq = treat * score_sq
+        gen treatxscore = `treat_var' * `score_var'
+        gen treatxscore_sq = `treat_var' * score_sq
 
     * Loop over unique events
         foreach e of local event {
@@ -84,31 +137,31 @@ program define rdpbt
                 forvalues i = 1/`group_range' {
 
                     * Run regressions without donut
-                        reg `dep_var' treat if inrange(`group_var', -`i', `i') & `event_var' == `e', robust
+						qui reg `dep_var' `treat_var' if inrange(`group_var', -`i', `i') & `event_var' == `e', robust
                         local levels = _b[treat]
 
-                        reg `dep_var' treat `score_var' treatxscore if inrange(`group_var', -`i', `i') & `event_var' == `e', robust
+                        qui reg `dep_var' `treat_var' `score_var' treatxscore if inrange(`group_var', -`i', `i') & `event_var' == `e', robust
                         local linear = _b[treat]
 
-                        reg `dep_var' treat `score_var' treatxscore score_sq treatxscore_sq  if inrange(`group_var', -`i', `i') & `event_var' == `e', robust
+                        qui reg `dep_var' `treat_var' `score_var' treatxscore score_sq treatxscore_sq  if inrange(`group_var', -`i', `i') & `event_var' == `e', robust
                         local quadratic = _b[treat]
 
                     * Run regressions with donut if specified
                         if "`donut_var'" != "" {
-                            reg `dep_var' treat if inrange(`group_var', -`i', `i') & `donut_var' == 0 & `event_var' == `e', robust
+                            qui reg `dep_var' `treat_var' if inrange(`group_var', -`i', `i') & `donut_var' == 0 & `event_var' == `e', robust
                             local levels_d = _b[treat]
 
-                            reg `dep_var' treat `score_var' treatxscore if inrange(`group_var', -`i', `i') & `donut_var' == 0 & `event_var' == `e', robust
+                            qui reg `dep_var' `treat_var' `score_var' treatxscore if inrange(`group_var', -`i', `i') & `donut_var' == 0 & `event_var' == `e', robust
                             local linear_d = _b[treat]
 
-                            reg `dep_var' treat `score_var' treatxscore score_sq treatxscore_sq if inrange(`group_var', -`i', `i') & `donut_var' == 0 & `event_var' == `e', robust
+                            qui reg `dep_var' `treat_var' `score_var' treatxscore score_sq treatxscore_sq if inrange(`group_var', -`i', `i') & `donut_var' == 0 & `event_var' == `e', robust
                             local quadratic_d = _b[treat]
                         }
 
                     * Save results into temporary file
 						preserve 
 							clear
-							set obs 1
+							qui set obs 1
 							gen event = `e'
 							gen group = `i'
 							gen levels = `levels'
@@ -120,9 +173,9 @@ program define rdpbt
 								gen linear_d = `linear_d'
 								gen quadratic_d = `quadratic_d'
 							}
-							append using `results'
-							tempfile results
-							save `results', replace
+							qui append using `results'
+							qui tempfile results
+							qui save `results', replace
 						restore
                 }
         }
@@ -143,13 +196,38 @@ program define rdpbt
         collapse (mean) rmse*, by(group)
 
     * Find the optimal specification
-        reshape long rmse_, i(group) j(model) string
-        sort rmse_
-        local model = model[1]
-        local bw = group[1]
-        di "Optimal Specification is `model' with a `bw' group bandwidth"
+        qui reshape long rmse_, i(group) j(model) string
+
+		if "`donut_var'" == "" {
+			sort rmse_
+			local model = model[1]
+			local bw = group[1]
+			di "Optimal Specification is `model' with a `bw' group bandwidth"
+		}
+		if "`donut_var'" != "" {
+			sort rmse_
+			qui split model, p(_)
+			local donut = model2[1]
+			local include_donut = cond("`donut'" == "d" ,"with", "without")
+			
+			local model = model1[1]
+			local bw = group[1]
+			di "Optimal Specification is `model' with a `bw' group bandwidth `include_donut' a donut"
+			
+		}	
 		
-	*Reopen original dataset
+	if "`tag_var'" != "" {
 		
+		*Reopen original dataset
+			use `original', clear
+			
+			*Generate a tag for the optimal bandwidth and donut
+			local include_donut = "with"
+				gen `tag_var' = inrange(`group_var', -`bw', `bw')
+				if "`include_donut'" == "with" {
+					qui replace `tag_var' = 0 if `donut_var' == 1
+				}
+
+	}
 
 end
