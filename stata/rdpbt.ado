@@ -8,9 +8,9 @@ program define rdpbt
         group_var(varlist) /// 
         group_range(numlist) ///
         [donut(varlist)] /// 
-	[treat(varlist)] ///
-	[placebo(varlist)] ///
-	[tag(string)] ///
+		[treat(varlist)] ///
+		[placebo(varlist)] ///
+		[tag(string)] ///
 
 	*Save original dataset
 		qui tempfile original
@@ -24,7 +24,7 @@ program define rdpbt
 		local dep_var `1'  // The dependent variable
 		local score_var `2'  // The score variable
 		
-		local score = subinstr("`score'", ",", "",.) //Corrects error where `score' without space next to "," caused var to be stored as `score,'
+		local score_var = subinstr("`score_var'", ",", "",.) //Corrects error where `score' without space next to "," caused var to be stored as `score,'
 	
 	* Check for invalid names
 		capture confirm variable `dep_var'
@@ -92,7 +92,6 @@ program define rdpbt
 		}
 	
     * Validate and handle `placebo`
-		local placebo_var ""
 		if "`placebo'" != "" {
 			capture confirm variable `placebo'
 			if _rc {
@@ -198,6 +197,7 @@ program define rdpbt
     * Find the optimal specification
         qui reshape long rmse_, i(group) j(model) string
 
+	*Formats optimal spec. message to include donut message (if applicable)
 		if "`donut_var'" == "" {
 			sort rmse_
 			local model = model[1]
@@ -222,7 +222,6 @@ program define rdpbt
 			use `original', clear
 			
 			*Generate a tag for the optimal bandwidth and donut
-			local include_donut = "with"
 				gen `tag_var' = inrange(`group_var', -`bw', `bw')
 				if "`include_donut'" == "with" {
 					qui replace `tag_var' = 0 if `donut_var' == 1
