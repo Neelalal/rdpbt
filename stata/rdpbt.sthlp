@@ -16,7 +16,7 @@
 {marker syntax}{...}
 {title:Syntax}
 
-{p 4 8}{cmd:rdpbt} {it:dep_var score_var} {ifin}{cmd:,} {opt event_var(event_var)} {opt group_var(group_var)} {opt group_range(#)} [{opt donut(donut_var)} {opt treat(treat_var)} {opt placebo(placebo_var)} {opt tag(string)}]{p_end}
+{p 4 8}{cmd:rdpbt} {it:dep_var score_var} {ifin}{cmd:,} {opt event_var(event_var)} {opt group_var(group_var)} {opt group_range(#)} [{opt donut(donut_var)} {opt treat(treat_var)} {opt placebo(placebo_var)} {opt tag(tag_var)}]{p_end}
 {p 8 8}
 where {it:score_var} refers to the running variable representing the distance from the treatment threshold.{p_end}
 
