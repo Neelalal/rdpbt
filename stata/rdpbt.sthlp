@@ -49,7 +49,7 @@ where {it:score_var} refers to the running variable representing the distance fr
 
 {p 4 8} Example usage of {cmd:rdpbt}:{p_end}
 {p 8 8} {cmd:. use "rdpbt_sim.dta", clear}{p_end}
-{p 8 8} {cmd:. rdpbt has_inc score if inrange(group, -9, 9), donut(donut) event_var(period) group_var(group) group_range(9)}{p_end}
+{p 8 8} {cmd:. rdpbt has_inc score if state == "CA", donut(donut) event_var(period) group_var(group) group_range(9)}{p_end}
 
 
 {marker stored_results}{...}
